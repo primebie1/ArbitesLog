@@ -26,7 +26,16 @@ namespace ArbitesLog
 			};
 
 			string jsonout = JsonSerializer.Serialize(message, options);
-			File.WriteAllText("\\" + ((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\" + msg.Id.ToString() + ".json", jsonout);
+			if(!Directory.Exists(((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\"))
+			{
+				Directory.CreateDirectory(((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\");
+			}
+			File.WriteAllText(((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\" + msg.Id.ToString() + ".json", jsonout);
+		}
+		public static LoggedMessage GetLog(ulong msgID, ulong guildID)
+		{
+			string jsonIn = File.ReadAllText(guildID.ToString() + "\\" + msgID + ".json");
+			return JsonSerializer.Deserialize<LoggedMessage>(jsonIn);
 		}
 	}
 }

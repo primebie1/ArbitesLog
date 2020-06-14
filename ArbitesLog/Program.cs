@@ -34,6 +34,7 @@ namespace ArbitesLog
 		public async Task MainAsync()
 		{
 			await InitCommands();
+			await InitLogger();
 
 			await _client.LoginAsync(TokenType.Bot, config.Token);
 			await _client.StartAsync();
@@ -81,6 +82,7 @@ namespace ArbitesLog
 			config.Token = Console.ReadLine();
 			Console.WriteLine("Please Input your prefered prefix for commands:");
 			config.Prefix = Console.ReadLine()[0];
+			
 
 			JsonSerializerOptions options = new JsonSerializerOptions
 			{
@@ -107,6 +109,27 @@ namespace ArbitesLog
 			return map.BuildServiceProvider();
 		}
 
+		private async Task InitLogger()
+		{
+			_client.MessageDeleted += HandleMessageDeleteAsync; 
+		}
+
+		private async Task HandleMessageDeleteAsync(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
+		{
+			ulong guildID = ((SocketTextChannel)channel).Guild.Id;
+			LoggedMessage logMsg = MessageLogger.GetLog(message.Id, guildID);	
+
+			var embed = new EmbedBuilder();
+			var em = embed.AddField("Message " + logMsg.MessageID.ToString(), logMsg.MessageContent)
+				.WithAuthor(_client.GetGuild(guildID).GetUser(logMsg.AuthorID))
+				.WithColor(Color.Blue)
+				.WithFooter(footer => footer.Text = "ArbitiesLog")
+				.WithTimestamp(logMsg.Timestamp)
+				.Build();
+
+			await ((SocketTextChannel)_client.GetChannel(GuildManager.GetGuildData(guildID).LogChannel)).SendMessageAsync(embed: em);
+		}
+
 		private async Task InitCommands()
 		{
 			await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
@@ -114,8 +137,11 @@ namespace ArbitesLog
 			_client.MessageReceived += HandleCommandAsync;
 		}
 
+
+
 		private async Task HandleCommandAsync(SocketMessage arg)
 		{
+			if (arg.Author == _client.CurrentUser) return;
 			MessageLogger.LogMessage(arg);
 			if (!(arg is SocketUserMessage msg)) return;
 

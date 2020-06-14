@@ -7,7 +7,7 @@ namespace ArbitesLog
 	/// <summary>
 	/// Class for storing message data long term
 	/// </summary>
-	class LoggedMessage
+	public class LoggedMessage
 	{
 		public ulong MessageID { get; set; }
 		public string MessageContent { get; set; }
