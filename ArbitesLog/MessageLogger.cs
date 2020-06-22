@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Discord.WebSocket;
 using System.Text.Json;
 using System.IO;
@@ -9,7 +10,7 @@ namespace ArbitesLog
 	public class MessageLogger
 	{
 
-		public static void LogMessage(SocketMessage msg)
+		public static async Task LogMessage(SocketMessage msg)
 		{
 			LoggedMessage message = new LoggedMessage
 			{
@@ -24,17 +25,17 @@ namespace ArbitesLog
 			{
 				WriteIndented = true
 			};
-
+			
 			string jsonout = JsonSerializer.Serialize(message, options);
-			if(!Directory.Exists(((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\"))
+			if(!Directory.Exists("Logs\\"+((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\"))
 			{
-				Directory.CreateDirectory(((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\");
+				Directory.CreateDirectory("Logs\\"+((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\");
 			}
-			File.WriteAllText(((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\" + msg.Id.ToString() + ".json", jsonout);
+			await File.WriteAllTextAsync("Logs\\"+((SocketTextChannel)msg.Channel).Guild.Id.ToString() + "\\" + msg.Id.ToString() + ".json", jsonout);
 		}
-		public static LoggedMessage GetLog(ulong msgID, ulong guildID)
+		public static async Task<LoggedMessage> GetLog(ulong msgID, ulong guildID)
 		{
-			string jsonIn = File.ReadAllText(guildID.ToString() + "\\" + msgID + ".json");
+			string jsonIn = await File.ReadAllTextAsync("Logs\\"+guildID.ToString() + "\\" + msgID + ".json");
 			return JsonSerializer.Deserialize<LoggedMessage>(jsonIn);
 		}
 	}

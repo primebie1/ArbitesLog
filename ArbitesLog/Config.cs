@@ -12,5 +12,7 @@ namespace ArbitesLog
 		public string Token { get; set; }
 		public ulong LogChannel { get; set; }
 		public char Prefix { get; set; }
+		public DateTime CleanupTime { get; set; }
+		public int MessageTimeToDie { get; set; }
 	}
 }

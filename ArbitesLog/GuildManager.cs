@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Discord.WebSocket;
+using System.Threading.Tasks;
 using Discord;
 using System.IO;
 using System.Text.Json;
@@ -10,9 +11,10 @@ namespace ArbitesLog
 {
 	public class GuildManager
 	{
-		static public GuildData GetGuildData(ulong guildID)
+		static public async Task<GuildData> GetGuildData(ulong guildID)
 		{
-			string jsonIn = File.ReadAllText("Config\\" + guildID + ".json");
+
+			string jsonIn = await File.ReadAllTextAsync("Config\\" + guildID + ".json");
 			return JsonSerializer.Deserialize<GuildData>(jsonIn);
 		}
 		static public bool CheckGuildData(ulong guildID)
@@ -24,14 +26,14 @@ namespace ArbitesLog
 			return File.Exists("Config\\" + guildID + ".json");
 		}
 
-		static public void SetGuildData(GuildData data)
+		static public async Task SetGuildData(GuildData data)
 		{
 			JsonSerializerOptions options = new JsonSerializerOptions
 			{
 				WriteIndented = true
 			};
 			string jsonOut = JsonSerializer.Serialize(data, options);
-			File.WriteAllText("Config\\" + data.GuildID + ".json", jsonOut);
+			await File.WriteAllTextAsync("Config\\" + data.GuildID + ".json", jsonOut);
 		}
 	}
 

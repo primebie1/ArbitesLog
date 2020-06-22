@@ -10,13 +10,14 @@ using System.Text.Json;
 
 namespace ArbitesLog
 {
+	[RequireUserPermission(GuildPermission.Administrator)]
 	public class LoggerModule:ModuleBase<SocketCommandContext>
 	{
 		[Command("Access")]
 		[Summary("Accesses Message Details From Log")]
 		public async Task AccessAsync(ulong iD)
 		{
-			LoggedMessage message = MessageLogger.GetLog(iD, Context.Guild.Id);
+			LoggedMessage message = await MessageLogger.GetLog(iD, Context.Guild.Id);
 
 			var embed = new EmbedBuilder();
 			var em = embed.AddField("Message " + message.MessageID.ToString(), message.MessageContent)
@@ -37,9 +38,9 @@ namespace ArbitesLog
 			
 			if (GuildManager.CheckGuildData(Context.Guild.Id))
 			{
-				GuildData data = GuildManager.GetGuildData(Context.Guild.Id);
+				GuildData data = await GuildManager.GetGuildData(Context.Guild.Id);
 				data.LogChannel = chanID;
-				GuildManager.SetGuildData(data);
+				await GuildManager.SetGuildData(data);
 			}
 			else
 			{
@@ -48,7 +49,7 @@ namespace ArbitesLog
 					GuildID = Context.Guild.Id,
 					LogChannel = chanID
 				};
-				GuildManager.SetGuildData(data);
+				await GuildManager.SetGuildData(data);
 			}
 		}
 
