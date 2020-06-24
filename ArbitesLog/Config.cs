@@ -7,7 +7,7 @@ namespace ArbitesLog
 	/// <summary>
 	/// Config Data For Operation Of ArbitesLog
 	/// </summary>
-	class Config
+	public class Config
 	{
 		public string Token { get; set; }
 		public ulong LogChannel { get; set; }
