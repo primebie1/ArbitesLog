@@ -53,6 +53,40 @@ namespace ArbitesLog
 		private void InitLogger()
 		{
 			_client.MessageDeleted += HandleMessageDeleteAsync;
+			_client.MessageUpdated += _client_MessageUpdated;
+		}
+
+		private async Task _client_MessageUpdated(Cacheable<IMessage, ulong> origMsg, SocketMessage message, ISocketMessageChannel channel)
+		{
+			ulong guildID = ((SocketTextChannel)channel).Guild.Id;
+			LoggedMessage logMsg = await MessageLogger.GetLog(origMsg.Id, guildID);
+
+
+			var origField = new EmbedFieldBuilder()
+				.WithName("Original Text of " + logMsg.MessageID.ToString())
+				.WithValue(logMsg.MessageContent[^1])
+				.WithIsInline(true);
+			var newField = new EmbedFieldBuilder()
+				.WithName("New Text Of " + logMsg.MessageID.ToString())
+				.WithValue(message.Content)
+				.WithIsInline(true);
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl("https://cdn.discordapp.com/avatars/729417603625517198/254497db41bcb2143e7b69274a857bda.png")
+				.WithText("ArbitiesLog");
+
+			var embed = new EmbedBuilder();
+			var em = embed.AddField(origField)
+				.AddField(newField)
+				.WithAuthor(_client.GetGuild(guildID).GetUser(logMsg.AuthorID))
+				.WithColor(Color.Gold)
+				.WithFooter(footer)
+				.WithTimestamp(logMsg.Timestamp)
+				.Build();
+			logMsg.MessageContent.Add(message.Content);
+			MessageLogger.UpdateLog(origMsg.Id, guildID, logMsg);
+			GuildData guildData = await GuildManager.GetGuildData(guildID);
+			await ((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: em);
+
 		}
 
 		private void InitCleaner()
@@ -88,16 +122,25 @@ namespace ArbitesLog
 			ulong guildID = ((SocketTextChannel)channel).Guild.Id;
 			LoggedMessage logMsg = await MessageLogger.GetLog(message.Id, guildID);
 
+			var msgField = new EmbedFieldBuilder()
+				.WithName("Message " + logMsg.MessageID.ToString())
+				.WithValue(logMsg.MessageContent[^1])
+				.WithIsInline(true);
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl("https://cdn.discordapp.com/avatars/729417603625517198/254497db41bcb2143e7b69274a857bda.png")
+				.WithText("ArbitiesLog");
+
 			var embed = new EmbedBuilder();
-			var em = embed.AddField("Message " + logMsg.MessageID.ToString(), logMsg.MessageContent)
+			var em = embed.AddField(msgField)
 				.WithAuthor(_client.GetGuild(guildID).GetUser(logMsg.AuthorID))
 				.WithColor(Color.Red)
-				.WithFooter(footer => footer.Text = "ArbitiesLog")
+				.WithFooter(footer)
 				.WithTimestamp(logMsg.Timestamp)
 				.Build();
 			GuildData guildData = await GuildManager.GetGuildData(guildID);
 			await ((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: em);
 		}
+
 
 		public static Task Log(LogMessage message)
 		{

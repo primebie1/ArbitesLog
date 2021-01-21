@@ -15,7 +15,7 @@ namespace ArbitesLog
 		[Summary("Gives the time till the next automatic cleanup")]
 		public async Task NextCleanAsync()
 		{
-			Config config = JsonSerializer.Deserialize<Config>(File.ReadAllText("Config\\config.json"));
+			Config config = JsonSerializer.Deserialize<Config>(File.ReadAllText("Config/config.json"));
 			TimeSpan span = config.CleanupTime.TimeOfDay - DateTime.Now.TimeOfDay;
 			var embed = new EmbedBuilder();
 			var em = embed.AddField("Time to next Cleanup", span.ToString("c"))
@@ -30,7 +30,7 @@ namespace ArbitesLog
 		[Summary("Runs log cleanup")]
 		public async Task RunCleanAsync()
 		{
-			Config config = JsonSerializer.Deserialize<Config>(File.ReadAllText("Config\\config.json"));
+			Config config = JsonSerializer.Deserialize<Config>(File.ReadAllText("Config/config.json"));
 			await DataManager.RunCleanup(config.MessageTimeToDie);
 		}
 	}

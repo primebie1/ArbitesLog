@@ -14,16 +14,16 @@ namespace ArbitesLog
 		static public async Task<GuildData> GetGuildData(ulong guildID)
 		{
 
-			string jsonIn = await File.ReadAllTextAsync("Config\\" + guildID + ".json");
+			string jsonIn = await File.ReadAllTextAsync("Config/" + guildID + ".json");
 			return JsonSerializer.Deserialize<GuildData>(jsonIn);
 		}
 		static public bool CheckGuildData(ulong guildID)
 		{
-			if (!Directory.Exists("Config\\"))
+			if (!Directory.Exists("Config"))
 			{
-				Directory.CreateDirectory("Config\\");
+				Directory.CreateDirectory("Config");
 			}
-			return File.Exists("Config\\" + guildID + ".json");
+			return File.Exists("Config/" + guildID + ".json");
 		}
 
 		static public async Task SetGuildData(GuildData data)
@@ -33,7 +33,7 @@ namespace ArbitesLog
 				WriteIndented = true
 			};
 			string jsonOut = JsonSerializer.Serialize(data, options);
-			await File.WriteAllTextAsync("Config\\" + data.GuildID + ".json", jsonOut);
+			await File.WriteAllTextAsync("Config/" + data.GuildID + ".json", jsonOut);
 		}
 	}
 

@@ -14,7 +14,7 @@ namespace ArbitesLog
 		{
 			LogMessage log = new LogMessage(LogSeverity.Info, "Cleanup", "Running Cleanup...");
 			await Program.Log(log);
-			string[] guilds = Directory.GetDirectories("Logs\\");
+			string[] guilds = Directory.GetDirectories("Logs");
 			foreach (string guild in guilds)
 			{
 				string[] messages = Directory.GetFiles(guild);

@@ -8,7 +8,7 @@ namespace ArbitesLog
 {
 	public class Startup
 	{
-		static readonly string confFile = "Config\\config.json";
+		static readonly string confFile = "Config/config.json";
 		static public Config ConfigStart()
 		{
 			if (File.Exists(confFile))
@@ -26,8 +26,8 @@ namespace ArbitesLog
 		static Config ConfSetup()
 		{
 			Config config = new Config();
-			Directory.CreateDirectory("Config\\");
-			Directory.CreateDirectory("Logs\\");
+			Directory.CreateDirectory("Config");
+			Directory.CreateDirectory("Logs");
 			//create config from user input
 			Console.WriteLine("Welcome to ArbitiesLog! This first run configuration will setup ArbitiesLog to run on your system!");
 			Console.WriteLine("Please input your Bot Token:");

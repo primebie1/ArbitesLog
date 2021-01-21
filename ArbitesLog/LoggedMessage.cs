@@ -10,7 +10,7 @@ namespace ArbitesLog
 	public class LoggedMessage
 	{
 		public ulong MessageID { get; set; }
-		public string MessageContent { get; set; }
+		public List<string> MessageContent { get; set; }
 		public ulong AuthorID { get; set; }
 		public ulong ChannelID { get; set; }
 		public DateTimeOffset Timestamp { get; set; }
