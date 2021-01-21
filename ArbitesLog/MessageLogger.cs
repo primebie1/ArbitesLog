@@ -17,6 +17,7 @@ namespace ArbitesLog
 				MessageID = msg.Id,
 				AuthorID = msg.Author.Id,
 				ChannelID = msg.Channel.Id,
+				MessageContent = new List<string>(),
 				Timestamp = msg.Timestamp
 			};
 			message.MessageContent.Add(msg.Content);
