@@ -39,7 +39,8 @@ namespace ArbitesLog
 			string[] timeSplit = timeIn.Split(' ');
 			int.TryParse(timeSplit[0], out int hour);
 			int.TryParse(timeSplit[1], out int min);
-			config.CleanupTime = new DateTime(1, 1, 11, hour, min, 0);
+
+			config.CleanupTime = DateTime.UtcNow.AddHours(hour).AddMinutes(min);
 
 			JsonSerializerOptions options = new JsonSerializerOptions
 			{
