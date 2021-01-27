@@ -19,14 +19,22 @@ namespace ArbitesLog
 		{
 			LoggedMessage message = await MessageLogger.GetLog(iD, Context.Guild.Id);
 
-			var embed = new EmbedBuilder();
-			var em = embed.AddField("Message " + message.MessageID.ToString(), message.MessageContent)
+			var titleField = new EmbedFieldBuilder()
+				.WithName("Message " + message.MessageID);
+			var embed = new EmbedBuilder()
+				.AddField(titleField)
 				.WithAuthor(Context.Guild.GetUser(message.AuthorID))
 				.WithColor(Color.Blue)
 				.WithFooter(footer => footer.Text = "ArbitiesLog")
-				.WithTimestamp(message.Timestamp)
-				.Build();
-
+				.WithTimestamp(message.Timestamp);
+				
+			foreach(string s in message.MessageContent)
+			{
+				var messageField = new EmbedFieldBuilder()
+					.WithValue(s);
+				embed.AddField(messageField);
+			}
+			var em = embed.Build();
 			await ReplyAsync(embed: em);
 		}
 

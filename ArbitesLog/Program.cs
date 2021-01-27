@@ -4,6 +4,9 @@ using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Linq;
+using System.Collections;
+using System.Text;
 
 namespace ArbitesLog
 {
@@ -54,6 +57,175 @@ namespace ArbitesLog
 		{
 			_client.MessageDeleted += HandleMessageDeleteAsync;
 			_client.MessageUpdated += _client_MessageUpdated;
+			_client.UserJoined += _client_UserJoined;
+			_client.UserLeft += _client_UserLeft;
+			_client.UserBanned += _client_UserBanned;
+			_client.UserUnbanned += _client_UserUnbanned;
+			_client.UserUpdated += _client_UserUpdated;
+			_client.MessagesBulkDeleted += _client_MessagesBulkDeleted;
+		}
+
+		private async Task _client_MessagesBulkDeleted(System.Collections.Generic.IReadOnlyCollection<Cacheable<IMessage, ulong>> messages, ISocketMessageChannel channel)
+		{
+			ulong guildID = ((SocketTextChannel)channel).Guild.Id;
+			StringBuilder fieldValue = new StringBuilder();
+			foreach (Cacheable<IMessage, ulong> cached in messages) 
+			{
+				fieldValue.Append(cached.Id + ", ");
+			}
+
+			var origField = new EmbedFieldBuilder()
+				.WithName(messages.Count + " Messages Deleted")
+				.WithValue(fieldValue.ToString());
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl(_client.CurrentUser.GetAvatarUrl())
+				.WithText("ArbitiesLog");
+			var embed = new EmbedBuilder()
+				.AddField(origField)
+				.WithFooter(footer)
+				.WithColor(Color.Red)
+				.Build();
+			GuildData guildData = await GuildManager.GetGuildData(guildID);
+			await((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: embed);
+		}
+
+		private async Task _client_UserUpdated(SocketUser arg1, SocketUser arg2)
+		{
+			ulong guildID = ((SocketGuildUser)arg1).Guild.Id;
+
+			SocketGuildUser userStart = (SocketGuildUser)arg1;
+			SocketGuildUser userEnd = (SocketGuildUser)arg2;
+
+			string actionTaken = "Should Not Be Seen";
+			StringBuilder fieldValue = new StringBuilder();
+			if (userStart.Roles.Count != userEnd.Roles.Count)
+			{
+				if (userStart.Roles.Count < userEnd.Roles.Count)
+				{
+					//Role Added
+					IEnumerable differentRoles = userEnd.Roles.Except(userStart.Roles);
+					actionTaken = "Role(s) Added";
+					foreach (SocketRole role in differentRoles)
+					{
+						fieldValue.Append(role.Name + "\n");
+					}
+				}
+				else
+				{
+					//Role Removed
+					IEnumerable differentRoles = userStart.Roles.Except(userEnd.Roles);
+					actionTaken = "Role(s) Removed";
+					foreach (SocketRole role in differentRoles)
+					{
+						fieldValue.Append(role.Name + "\n");
+					}
+				}
+			}
+			else if (userStart.Nickname != userEnd.Nickname)
+			{
+				actionTaken = "Nickname Changed";
+				fieldValue.Append(userStart.Nickname + " --> " + userEnd.Nickname);
+			}
+
+			var origField = new EmbedFieldBuilder()
+				.WithName(actionTaken)
+				.WithValue(fieldValue.ToString());
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl(_client.CurrentUser.GetAvatarUrl())
+				.WithText("ArbitiesLog");
+			var embed = new EmbedBuilder()
+				.WithImageUrl(userStart.GetAvatarUrl(ImageFormat.Auto, 512))
+				.AddField(origField)
+				.WithFooter(footer)
+				.WithColor(Color.Gold)
+				.Build();
+			GuildData guildData = await GuildManager.GetGuildData(guildID);
+			await ((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: embed);
+		}
+
+		private async Task _client_UserUnbanned(SocketUser user, SocketGuild guild)
+		{
+			ulong guildID = guild.Id;
+
+			var origField = new EmbedFieldBuilder()
+				.WithName("User Unbanned")
+				.WithValue(user.Username);
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl(_client.CurrentUser.GetAvatarUrl())
+				.WithText("ArbitiesLog");
+			var embed = new EmbedBuilder()
+				.WithImageUrl(user.GetAvatarUrl(ImageFormat.Auto, 512))
+				.AddField(origField)
+				.WithFooter(footer)
+				.WithColor(Color.Green)
+				.Build();
+			GuildData guildData = await GuildManager.GetGuildData(guildID);
+			await((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: embed);
+		}
+
+		private async Task _client_UserBanned(SocketUser user, SocketGuild guild)
+		{
+			ulong guildID = guild.Id;
+
+			var origField = new EmbedFieldBuilder()
+				.WithName("User Banned")
+				.WithValue(user.Username);
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl(_client.CurrentUser.GetAvatarUrl())
+				.WithText("ArbitiesLog");
+			var embed = new EmbedBuilder()
+				.WithImageUrl(user.GetAvatarUrl(ImageFormat.Auto, 512))
+				.AddField(origField)
+				.WithFooter(footer)
+				.WithColor(Color.Red)
+				.Build();
+			GuildData guildData = await GuildManager.GetGuildData(guildID);
+			await((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: embed);
+		}
+
+		private async Task _client_UserLeft(SocketGuildUser user)
+		{
+			ulong guildID = user.Guild.Id;
+
+			var origField = new EmbedFieldBuilder()
+				.WithName("User Left")
+				.WithValue(user.Username);
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl(_client.CurrentUser.GetAvatarUrl())
+				.WithText("ArbitiesLog");
+			var embed = new EmbedBuilder()
+				.WithImageUrl(user.GetAvatarUrl(ImageFormat.Auto, 512))
+				.AddField(origField)
+				.WithFooter(footer)
+				.WithColor(Color.Red)
+				.Build();
+			GuildData guildData = await GuildManager.GetGuildData(guildID);
+			await ((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: embed);
+		}
+
+		private async Task _client_UserJoined(SocketGuildUser user)
+		{
+			ulong guildID = user.Guild.Id;
+			var creationTime = user.CreatedAt.UtcDateTime;
+			TimeSpan timeExisted = DateTimeOffset.UtcNow - creationTime;
+			var origField = new EmbedFieldBuilder()
+				.WithName("New User Joined")
+				.WithValue(user.Username);
+			var timeField = new EmbedFieldBuilder()
+				.WithName("Account Age")
+				.WithValue(timeExisted.ToString());
+			var footer = new EmbedFooterBuilder()
+				.WithIconUrl(_client.CurrentUser.GetAvatarUrl())
+				.WithText("ArbitiesLog");
+			var embed = new EmbedBuilder()
+				.WithImageUrl(user.GetAvatarUrl(ImageFormat.Auto, 512))
+				.AddField(origField)
+				.AddField(timeField)
+				.WithFooter(footer)
+				.WithColor(Color.Green)
+				.Build();
+			GuildData guildData = await GuildManager.GetGuildData(guildID);
+			await((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: embed);
 		}
 
 		private async Task _client_MessageUpdated(Cacheable<IMessage, ulong> origMsg, SocketMessage message, ISocketMessageChannel channel)
