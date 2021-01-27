@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ArbitesLog
 {
-	class GenUtilModule : ModuleBase<SocketCommandContext>
+	public class GenUtilModule : ModuleBase<SocketCommandContext>
 	{
 		[Command("BotInfo")]
 		[Summary("Displays info on bot")]
