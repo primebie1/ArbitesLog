@@ -63,7 +63,7 @@ namespace ArbitesLog
 			_client.UserLeft += _client_UserLeft;
 			_client.UserBanned += _client_UserBanned;
 			_client.UserUnbanned += _client_UserUnbanned;
-			_client.UserUpdated += _client_UserUpdated;
+			_client.GuildMemberUpdated += _client_GuildMemberUpdated;
 			_client.MessagesBulkDeleted += _client_MessagesBulkDeleted;
 		}
 
@@ -91,7 +91,7 @@ namespace ArbitesLog
 			await((SocketTextChannel)_client.GetChannel(guildData.LogChannel)).SendMessageAsync(embed: embed);
 		}
 
-		private async Task _client_UserUpdated(SocketUser arg1, SocketUser arg2)
+		private async Task _client_GuildMemberUpdated(SocketUser arg1, SocketUser arg2)
 		{
 			ulong guildID = ((SocketGuildUser)arg1).Guild.Id;
 			LogMessage msg = new LogMessage(LogSeverity.Info, "EventLogger", $"User {arg1.Id} in Guild {guildID} Updated!");
