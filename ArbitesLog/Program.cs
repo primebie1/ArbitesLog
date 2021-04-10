@@ -94,7 +94,8 @@ namespace ArbitesLog
 		private async Task _client_UserUpdated(SocketUser arg1, SocketUser arg2)
 		{
 			ulong guildID = ((SocketGuildUser)arg1).Guild.Id;
-
+			LogMessage msg = new LogMessage(LogSeverity.Info, "EventLogger", $"User {arg1.Id} in Guild {guildID} Updated!");
+			Log(msg);
 			SocketGuildUser userStart = (SocketGuildUser)arg1;
 			SocketGuildUser userEnd = (SocketGuildUser)arg2;
 
@@ -148,6 +149,8 @@ namespace ArbitesLog
 		private async Task _client_UserUnbanned(SocketUser user, SocketGuild guild)
 		{
 			ulong guildID = guild.Id;
+			LogMessage msg = new LogMessage(LogSeverity.Info, "EventLogger", $"User {user.Id} in Guild {guildID} Unbanned!");
+			Log(msg);
 
 			var origField = new EmbedFieldBuilder()
 				.WithName("User Unbanned")
@@ -168,6 +171,8 @@ namespace ArbitesLog
 		private async Task _client_UserBanned(SocketUser user, SocketGuild guild)
 		{
 			ulong guildID = guild.Id;
+			LogMessage msg = new LogMessage(LogSeverity.Info, "EventLogger", $"User {user.Id} in Guild {guildID} Banned!");
+			Log(msg);
 
 			var origField = new EmbedFieldBuilder()
 				.WithName("User Banned")
@@ -188,6 +193,8 @@ namespace ArbitesLog
 		private async Task _client_UserLeft(SocketGuildUser user)
 		{
 			ulong guildID = user.Guild.Id;
+			LogMessage msg = new LogMessage(LogSeverity.Info, "EventLogger", $"User {user.Id} Left Guild {guildID}!");
+			Log(msg);
 
 			var origField = new EmbedFieldBuilder()
 				.WithName("User Left")
@@ -208,6 +215,9 @@ namespace ArbitesLog
 		private async Task _client_UserJoined(SocketGuildUser user)
 		{
 			ulong guildID = user.Guild.Id;
+			LogMessage msg = new LogMessage(LogSeverity.Info, "EventLogger", $"User {user.Id} Joined Guild {guildID}!");
+			Log(msg);
+
 			var creationTime = user.CreatedAt.UtcDateTime;
 			TimeSpan timeExisted = DateTimeOffset.UtcNow - creationTime;
 			var origField = new EmbedFieldBuilder()
