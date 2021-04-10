@@ -7,6 +7,7 @@ using System.Timers;
 using System.Linq;
 using System.Collections;
 using System.Text;
+using System.Reflection;
 
 namespace ArbitesLog
 {
@@ -35,6 +36,7 @@ namespace ArbitesLog
 
 		private Program()
 		{
+			Console.WriteLine($"ArbitesLog v{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
 			config = Startup.ConfigStart();
 			//configure SocketClient
 			_client = new DiscordSocketClient(new DiscordSocketConfig

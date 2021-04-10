@@ -44,5 +44,7 @@ namespace ArbitesLog
 	{
 		public ulong GuildID { get; set; }
 		public ulong LogChannel { get; set; }
+
+		public List<ulong> AssignableRoles { get; set; }
 	}
 }
